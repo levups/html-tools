@@ -316,7 +316,30 @@ Example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZS
             }
         }
 
-        jwtInput.addEventListener('input', decodeJWT);
+        function updatePageURL() {
+            const input = jwtInput.value.trim();
+            const newURL = new URL(window.location.href);
+
+            if (input) {
+                newURL.searchParams.set('token', input);
+            } else {
+                newURL.searchParams.delete('token');
+            }
+
+            history.replaceState(null, '', newURL.toString());
+        }
+
+        jwtInput.addEventListener('input', () => {
+            decodeJWT();
+            updatePageURL();
+        });
+
+        // Load from URL on init
+        const initialToken = new URLSearchParams(window.location.search).get('token');
+        if (initialToken) {
+            jwtInput.value = initialToken;
+            decodeJWT();
+        }
 
         function setupCopyButton(btn, getContent) {
             btn.addEventListener('click', () => {
