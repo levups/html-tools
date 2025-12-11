@@ -6,64 +6,10 @@
     <title>CSV to JSON</title>
     <link rel="stylesheet" href="common.css">
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .options {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .option-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .option-group label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .option-group select,
-        .option-group input[type="checkbox"],
-        .option-group input[type="text"] {
-            cursor: pointer;
-        }
-
-        .option-group select {
-            padding: 8px 12px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            background: white;
-            font-size: 0.9rem;
-        }
-
-        .option-group input[type="text"] {
-            width: 50px;
-            padding: 8px 12px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            text-align: center;
-            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-        }
-
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent-blue);
-        }
-
-        .stats {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-left: auto;
-        }
+        body { display: flex; flex-direction: column; }
+        .options { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+        .option-group input[type="text"] { width: 50px; text-align: center; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+        .stats { font-size: 0.85rem; color: var(--text-secondary); margin-left: auto; }
     </style>
 </head>
 <body>
