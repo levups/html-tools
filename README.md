@@ -26,6 +26,7 @@ A collection of simple, browser-based utilities. No server required - just open 
 
 **Other Tools**
 - Markdown Preview - Live markdown to HTML
+- Paste Rich Text - Extract HTML from pasted rich text
 - Diff - Compare text with colored output
 
 ## Usage

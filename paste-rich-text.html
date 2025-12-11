@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rich Text HTML Extractor</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .pane {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        #pasteArea {
+            flex: 1;
+            border: none;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            outline: none;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            overflow: auto;
+            min-height: 0;
+        }
+
+        .paste-status {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--accent-mint);
+            font-weight: 500;
+        }
+
+        .paste-status.visible {
+            display: flex;
+        }
+
+        .paste-status svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        #htmlOutput {
+            flex: 1;
+            min-height: 0;
+        }
+
+        #previewContent {
+            flex: 1;
+            padding: 16px;
+            overflow: auto;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            min-height: 0;
+        }
+
+        #previewContent:empty::before {
+            content: "HTML preview will appear here...";
+            color: var(--text-muted);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-switch input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--input-border);
+            border-radius: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--accent-blue);
+        }
+
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        .toggle-switch input:focus + .toggle-slider {
+            box-shadow: 0 0 0 3px var(--ring-color);
+        }
+
+        .toggle-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .info-text {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        All Tools
+    </a>
+
+    <header>
+        <h1>Rich Text HTML Extractor</h1>
+        <p class="subtitle">Paste formatted text to extract HTML</p>
+    </header>
+
+    <div class="controls">
+        <button id="clearBtn" class="secondary">Clear All</button>
+        <label class="toggle-switch">
+            <input type="checkbox" id="stripAttributes" checked>
+            <span class="toggle-slider" aria-hidden="true"></span>
+            <span class="toggle-label">Strip attributes</span>
+        </label>
+    </div>
+
+    <div class="container">
+        <div class="pane">
+            <div class="pane-header">
+                <span class="label">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                    </svg>
+                    Paste Area
+                </span>
+                <span id="pasteStatus" class="paste-status">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Extracted
+                </span>
+            </div>
+            <textarea id="pasteArea" placeholder="Paste rich text here (Ctrl+V or ⌘V)..." spellcheck="false"></textarea>
+        </div>
+
+        <div class="pane">
+            <div class="pane-header">
+                <span class="label">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                    HTML Output
+                </span>
+                <button id="copyBtn" class="copy-btn">Copy</button>
+            </div>
+            <textarea id="htmlOutput" readonly placeholder="HTML code will appear here..." spellcheck="false"></textarea>
+        </div>
+
+        <div class="pane">
+            <div class="pane-header">
+                <span class="label">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    Preview
+                </span>
+            </div>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const pasteArea = document.getElementById('pasteArea');
+        const pasteStatus = document.getElementById('pasteStatus');
+        const htmlOutput = document.getElementById('htmlOutput');
+        const previewContent = document.getElementById('previewContent');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const stripAttributesCheckbox = document.getElementById('stripAttributes');
+
+        let rawHtml = '';
+
+        const voidElements = new Set(['area','base','br','col','embed','hr','img','input','link','meta','source','track','wbr']);
+
+        function prettyPrint(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const lines = [];
+
+            function serialize(node, indent) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent.trim();
+                    if (text) lines.push('  '.repeat(indent) + text);
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tag = node.tagName.toLowerCase();
+                    let attrs = '';
+                    for (const attr of node.attributes) {
+                        attrs += ` ${attr.name}="${attr.value}"`;
+                    }
+                    if (voidElements.has(tag)) {
+                        lines.push('  '.repeat(indent) + `<${tag}${attrs}>`);
+                    } else if (node.children.length === 0 && node.textContent.trim().length < 80) {
+                        lines.push('  '.repeat(indent) + `<${tag}${attrs}>${node.textContent.trim()}</${tag}>`);
+                    } else {
+                        lines.push('  '.repeat(indent) + `<${tag}${attrs}>`);
+                        for (const child of node.childNodes) {
+                            serialize(child, indent + 1);
+                        }
+                        lines.push('  '.repeat(indent) + `</${tag}>`);
+                    }
+                }
+            }
+
+            for (const child of doc.body.childNodes) {
+                serialize(child, 0);
+            }
+            return lines.join('\n');
+        }
+
+        function stripAllAttributes(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+
+            function processNode(node) {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    while (node.attributes.length > 0) {
+                        node.removeAttribute(node.attributes[0].name);
+                    }
+                    for (const child of node.childNodes) {
+                        processNode(child);
+                    }
+                }
+            }
+
+            for (const child of doc.body.childNodes) {
+                processNode(child);
+            }
+
+            return doc.body.innerHTML;
+        }
+
+        function updateOutput() {
+            if (!rawHtml) {
+                htmlOutput.value = '';
+                previewContent.innerHTML = '';
+                return;
+            }
+
+            let outputHtml = stripAttributesCheckbox.checked
+                ? stripAllAttributes(rawHtml)
+                : rawHtml;
+
+            htmlOutput.value = prettyPrint(outputHtml);
+            previewContent.innerHTML = outputHtml;
+        }
+
+        pasteArea.addEventListener('paste', function(e) {
+            const html = e.clipboardData.getData('text/html');
+            if (html) {
+                e.preventDefault();
+                rawHtml = html;
+                pasteArea.value = '';
+                updateOutput();
+                pasteStatus.classList.add('visible');
+            }
+        });
+
+        stripAttributesCheckbox.addEventListener('change', updateOutput);
+
+        clearBtn.addEventListener('click', () => {
+            pasteArea.value = '';
+            pasteStatus.classList.remove('visible');
+            htmlOutput.value = '';
+            previewContent.innerHTML = '';
+            rawHtml = '';
+            pasteArea.focus();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            if (!htmlOutput.value) return;
+            navigator.clipboard.writeText(htmlOutput.value).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
