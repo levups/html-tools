@@ -84,7 +84,8 @@ All tools should `<link rel="stylesheet" href="common.css">` and only add page-s
 When adding or updating a tool:
 1. Create/update the tool HTML file
 2. Add/update a card in `index.html` with appropriate `data-keywords`
-3. **Always update `README.md`** to reflect the new/updated tool
+3. **Keep tools sorted alphabetically** in `index.html`
+4. **Always update `README.md`** to reflect the new/updated tool
 
 ## External Dependencies (if absolutely needed)
 

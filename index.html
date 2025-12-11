@@ -41,9 +41,6 @@
             padding: 16px;
             text-decoration: none;
             color: inherit;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
             transition: box-shadow 0.15s, transform 0.15s;
         }
 
@@ -58,15 +55,6 @@
         }
 
         .tool-card.hidden { display: none; }
-
-        .tool-icon {
-            width: 32px;
-            height: 32px;
-            flex-shrink: 0;
-            color: var(--accent-coral);
-        }
-
-        .tool-content { flex: 1; min-width: 0; }
 
         .tool-title {
             margin: 0 0 4px 0;
@@ -112,134 +100,69 @@
         </div>
 
         <div class="tools-grid" id="toolsGrid" role="list">
-            <a href="json-to-yaml.html" class="tool-card" data-keywords="json yaml convert" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">JSON to YAML</h2>
-                    <p class="tool-description">Convert JSON to YAML in real-time</p>
-                </div>
-            </a>
-
-            <a href="json-formatter.html" class="tool-card" data-keywords="json format pretty minify" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">JSON Formatter</h2>
-                    <p class="tool-description">Pretty print or minify JSON</p>
-                </div>
-            </a>
-
-            <a href="yaml-formatter.html" class="tool-card" data-keywords="yaml format pretty" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="7" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">YAML Formatter</h2>
-                    <p class="tool-description">Pretty print and validate YAML</p>
-                </div>
-            </a>
-
-            <a href="csv-to-json.html" class="tool-card" data-keywords="csv json convert table" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">CSV to JSON</h2>
-                    <p class="tool-description">Convert CSV with custom options</p>
-                </div>
-            </a>
-
-            <a href="base64.html" class="tool-card" data-keywords="base64 encode decode" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">Base64</h2>
-                    <p class="tool-description">Encode/decode Base64 bidirectionally</p>
-                </div>
-            </a>
-
-            <a href="url-encoder.html" class="tool-card" data-keywords="url encode decode uri percent" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">URL Encoder</h2>
-                    <p class="tool-description">Encode/decode URL components</p>
-                </div>
-            </a>
-
-            <a href="html-entities.html" class="tool-card" data-keywords="html entity encode decode escape" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">HTML Entities</h2>
-                    <p class="tool-description">Encode/decode HTML entities</p>
-                </div>
-            </a>
-
-            <a href="jwt-decoder.html" class="tool-card" data-keywords="jwt token decode auth" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">JWT Decoder</h2>
-                    <p class="tool-description">Decode and inspect JWT tokens</p>
-                </div>
-            </a>
-
-            <a href="timestamp.html" class="tool-card" data-keywords="timestamp unix epoch date time timezone" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">Timestamp</h2>
-                    <p class="tool-description">Unix timestamp with timezone support</p>
-                </div>
+            <a href="base64.html" class="tool-card" data-keywords="base64 encode decode binary" role="listitem">
+                <h2 class="tool-title">Base64</h2>
+                <p class="tool-description">Encode/decode Base64 bidirectionally</p>
             </a>
 
             <a href="color-converter.html" class="tool-card" data-keywords="color hex rgb hsl oklch" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <circle cx="13.5" cy="6.5" r="2.5" fill="#ff6b6b" stroke="none"/><circle cx="17.5" cy="10.5" r="2.5" fill="#6bcb77" stroke="none"/><circle cx="8.5" cy="7.5" r="2.5" fill="#4d96ff" stroke="none"/><circle cx="6.5" cy="12.5" r="2.5" fill="#ffd93d" stroke="none"/><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">Color Converter</h2>
-                    <p class="tool-description">HEX, RGB, HSL, OKLCH and more</p>
-                </div>
+                <h2 class="tool-title">Color Converter</h2>
+                <p class="tool-description">HEX, RGB, HSL, OKLCH and more</p>
             </a>
 
-            <a href="regex-tester.html" class="tool-card" data-keywords="regex regular expression test pattern" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">Regex Tester</h2>
-                    <p class="tool-description">Test JS regex with highlighting</p>
-                </div>
-            </a>
-
-            <a href="markdown-preview.html" class="tool-card" data-keywords="markdown md preview html" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">Markdown Preview</h2>
-                    <p class="tool-description">Live markdown to HTML preview</p>
-                </div>
+            <a href="csv-to-json.html" class="tool-card" data-keywords="csv json convert table" role="listitem">
+                <h2 class="tool-title">CSV to JSON</h2>
+                <p class="tool-description">Convert CSV with custom options</p>
             </a>
 
             <a href="diff-checker.html" class="tool-card" data-keywords="diff compare difference text" role="listitem">
-                <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-                </svg>
-                <div class="tool-content">
-                    <h2 class="tool-title">Diff Checker</h2>
-                    <p class="tool-description">Compare text with colored diff</p>
-                </div>
+                <h2 class="tool-title">Diff Checker</h2>
+                <p class="tool-description">Compare text with colored diff</p>
+            </a>
+
+            <a href="html-entities.html" class="tool-card" data-keywords="html entity encode decode escape" role="listitem">
+                <h2 class="tool-title">HTML Entities</h2>
+                <p class="tool-description">Encode/decode HTML entities</p>
+            </a>
+
+            <a href="json-formatter.html" class="tool-card" data-keywords="json format pretty minify" role="listitem">
+                <h2 class="tool-title">JSON Formatter</h2>
+                <p class="tool-description">Pretty print or minify JSON</p>
+            </a>
+
+            <a href="json-to-yaml.html" class="tool-card" data-keywords="json yaml convert" role="listitem">
+                <h2 class="tool-title">JSON to YAML</h2>
+                <p class="tool-description">Convert JSON to YAML in real-time</p>
+            </a>
+
+            <a href="jwt-decoder.html" class="tool-card" data-keywords="jwt token decode auth" role="listitem">
+                <h2 class="tool-title">JWT Decoder</h2>
+                <p class="tool-description">Decode and inspect JWT tokens</p>
+            </a>
+
+            <a href="markdown-preview.html" class="tool-card" data-keywords="markdown md preview html" role="listitem">
+                <h2 class="tool-title">Markdown Preview</h2>
+                <p class="tool-description">Live markdown to HTML preview</p>
+            </a>
+
+            <a href="regex-tester.html" class="tool-card" data-keywords="regex regular expression test pattern" role="listitem">
+                <h2 class="tool-title">Regex Tester</h2>
+                <p class="tool-description">Test JS regex with highlighting</p>
+            </a>
+
+            <a href="timestamp.html" class="tool-card" data-keywords="timestamp unix epoch date time timezone" role="listitem">
+                <h2 class="tool-title">Timestamp</h2>
+                <p class="tool-description">Unix timestamp with timezone support</p>
+            </a>
+
+            <a href="url-encoder.html" class="tool-card" data-keywords="url encode decode uri percent" role="listitem">
+                <h2 class="tool-title">URL Encoder</h2>
+                <p class="tool-description">Encode/decode URL components</p>
+            </a>
+
+            <a href="yaml-formatter.html" class="tool-card" data-keywords="yaml format pretty" role="listitem">
+                <h2 class="tool-title">YAML Formatter</h2>
+                <p class="tool-description">Pretty print and validate YAML</p>
             </a>
         </div>
 
