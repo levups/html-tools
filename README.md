@@ -26,7 +26,7 @@ A collection of simple, browser-based utilities. No server required - just open 
 
 **Other Tools**
 - Markdown Preview - Live markdown to HTML
-- Text Diff - Compare text with colored output
+- Diff - Compare text with colored output
 
 ## Usage
 
