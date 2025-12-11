@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .options {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .option-group select,
+        .option-group input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .option-group select {
+            padding: 8px 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="shape-dots"></div>
+    <div class="shape-ring"></div>
+
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        All Tools
+    </a>
+
+    <header>
+        <h1>JSON Formatter</h1>
+        <p class="subtitle">Pretty print or minify JSON</p>
+    </header>
+
+    <div class="controls">
+        <button id="formatBtn">Format</button>
+        <button id="minifyBtn">Minify</button>
+        <button id="clearBtn" class="secondary">Clear</button>
+        <div class="options">
+            <div class="option-group">
+                <label for="indentSelect">Indent:</label>
+                <select id="indentSelect">
+                    <option value="2">2 spaces</option>
+                    <option value="4">4 spaces</option>
+                    <option value="tab">Tab</option>
+                </select>
+            </div>
+            <div class="option-group">
+                <input type="checkbox" id="sortKeys">
+                <label for="sortKeys">Sort keys</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="pane">
+            <div class="pane-header">
+                <span class="label">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    Input
+                    <span id="statusIndicator" class="status-indicator"></span>
+                </span>
+            </div>
+            <textarea id="inputArea" placeholder='Paste your JSON here...
+
+Example:
+{"name":"John","age":30,"city":"New York"}' spellcheck="false"></textarea>
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+
+        <div class="pane">
+            <div class="pane-header">
+                <span class="label">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    Output
+                </span>
+                <button id="copyBtn" class="copy-btn">Copy</button>
+            </div>
+            <textarea id="outputArea" readonly placeholder="Formatted JSON will appear here..." spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <script>
+        const inputArea = document.getElementById('inputArea');
+        const outputArea = document.getElementById('outputArea');
+        const formatBtn = document.getElementById('formatBtn');
+        const minifyBtn = document.getElementById('minifyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const indentSelect = document.getElementById('indentSelect');
+        const sortKeysCheckbox = document.getElementById('sortKeys');
+        const errorMessage = document.getElementById('errorMessage');
+        const statusIndicator = document.getElementById('statusIndicator');
+
+        function sortObjectKeys(obj) {
+            if (obj === null || typeof obj !== 'object') {
+                return obj;
+            }
+            if (Array.isArray(obj)) {
+                return obj.map(sortObjectKeys);
+            }
+            const sorted = {};
+            Object.keys(obj).sort().forEach(key => {
+                sorted[key] = sortObjectKeys(obj[key]);
+            });
+            return sorted;
+        }
+
+        function format(minify = false) {
+            const input = inputArea.value.trim();
+
+            errorMessage.style.display = 'none';
+            statusIndicator.className = 'status-indicator';
+
+            if (!input) {
+                outputArea.value = '';
+                return;
+            }
+
+            try {
+                let parsed = JSON.parse(input);
+
+                if (sortKeysCheckbox.checked) {
+                    parsed = sortObjectKeys(parsed);
+                }
+
+                if (minify) {
+                    outputArea.value = JSON.stringify(parsed);
+                } else {
+                    const indentValue = indentSelect.value;
+                    const indent = indentValue === 'tab' ? '\t' : parseInt(indentValue, 10);
+                    outputArea.value = JSON.stringify(parsed, null, indent);
+                }
+
+                statusIndicator.className = 'status-indicator valid';
+            } catch (e) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Invalid JSON: ' + e.message;
+                outputArea.value = '';
+                statusIndicator.className = 'status-indicator invalid';
+            }
+        }
+
+        formatBtn.addEventListener('click', () => format(false));
+        minifyBtn.addEventListener('click', () => format(true));
+
+        // Auto-format on input
+        inputArea.addEventListener('input', () => format(false));
+
+        clearBtn.addEventListener('click', () => {
+            inputArea.value = '';
+            outputArea.value = '';
+            errorMessage.style.display = 'none';
+            statusIndicator.className = 'status-indicator';
+            inputArea.focus();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            if (!outputArea.value) return;
+            navigator.clipboard.writeText(outputArea.value).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        });
+
+        // Re-format when options change
+        indentSelect.addEventListener('change', () => format(false));
+        sortKeysCheckbox.addEventListener('change', () => format(false));
+    </script>
+</body>
+</html>
