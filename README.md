@@ -4,15 +4,36 @@ A collection of simple, browser-based utilities. No server required - just open 
 
 ## Tools
 
-- **JSON to YAML Converter** - Real-time JSON to YAML conversion
-- **Base64 Encoder/Decoder** - Encode and decode Base64 strings
-- **Color Converter** - Convert between HEX, RGB, HSL, HWB, LAB, LCH, OKLAB, OKLCH
+**Converters**
+- JSON to YAML - Convert JSON to YAML format
+- CSV to JSON - Convert CSV with custom delimiters
+- Color Converter - HEX, RGB, HSL, HWB, LAB, LCH, OKLAB, OKLCH
+- Timestamp Converter - Unix timestamps with timezone support
+
+**Formatters**
+- JSON Formatter - Pretty print or minify with key sorting
+- YAML Formatter - Pretty print with key sorting
+
+**Encoders/Decoders**
+- Base64 Encoder/Decoder - Bidirectional real-time
+- URL Encoder/Decoder - Bidirectional real-time
+- HTML Entity Encoder - Bidirectional real-time
+- JWT Decoder - Decode and inspect tokens
+
+**Other Tools**
+- Regex Tester - Test JS regex with highlighting
+- Markdown Preview - Live markdown to HTML
+- Diff Checker - Compare text with colored output
 
 ## Usage
 
 Open `index.html` in a browser, or serve with any static file server.
 
 Filter tools on load with `?q=json` query parameter.
+
+## Development
+
+See `AGENTS.md` for coding guidelines.
 
 ## License
 

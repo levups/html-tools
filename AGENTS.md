@@ -72,10 +72,10 @@ function updateA() {
 All tools should `<link rel="stylesheet" href="common.css">` and only add page-specific styles inline.
 
 ### Index Integration
-When adding a new tool:
-1. Create the tool HTML file
-2. Add a card to `index.html` with appropriate `data-keywords`
-3. Update `README.md`
+When adding or updating a tool:
+1. Create/update the tool HTML file
+2. Add/update a card in `index.html` with appropriate `data-keywords`
+3. **Always update `README.md`** to reflect the new/updated tool
 
 ## External Dependencies (if absolutely needed)
 
