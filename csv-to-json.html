@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV to JSON</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .options {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .option-group select,
+        .option-group input[type="checkbox"],
+        .option-group input[type="text"] {
+            cursor: pointer;
+        }
+
+        .option-group select {
+            padding: 8px 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .option-group input[type="text"] {
+            width: 50px;
+            padding: 8px 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-blue);
+        }
+
+        .stats {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="shape-dots"></div>
+    <div class="shape-ring"></div>
+
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        All Tools
+    </a>
+
+    <header>
+        <h1>CSV to JSON</h1>
+        <p class="subtitle">Convert CSV data to JSON format</p>
+    </header>
+
+    <div class="controls">
+        <button id="convertBtn">Convert</button>
+        <button id="clearBtn" class="secondary">Clear</button>
+        <div class="options">
+            <div class="option-group">
+                <label for="delimiterInput">Delimiter:</label>
+                <input type="text" id="delimiterInput" value="," maxlength="1">
+            </div>
+            <div class="option-group">
+                <input type="checkbox" id="hasHeader" checked>
+                <label for="hasHeader">First row is header</label>
+            </div>
+            <div class="option-group">
+                <input type="checkbox" id="trimValues" checked>
+                <label for="trimValues">Trim whitespace</label>
+            </div>
+            <span id="stats" class="stats"></span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="pane">
+            <div class="pane-header">
+                <span class="label">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    CSV Input
+                    <span id="statusIndicator" class="status-indicator"></span>
+                </span>
+            </div>
+            <textarea id="csvInput" placeholder='Paste your CSV data here...
+
+Example:
+name,age,city
+John,30,New York
+Jane,25,Los Angeles
+Bob,35,Chicago' spellcheck="false"></textarea>
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+
+        <div class="pane">
+            <div class="pane-header">
+                <span class="label">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    JSON Output
+                </span>
+                <button id="copyBtn" class="copy-btn">Copy</button>
+            </div>
+            <textarea id="jsonOutput" readonly placeholder="JSON output will appear here..." spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <script>
+        const csvInput = document.getElementById('csvInput');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const delimiterInput = document.getElementById('delimiterInput');
+        const hasHeaderCheckbox = document.getElementById('hasHeader');
+        const trimValuesCheckbox = document.getElementById('trimValues');
+        const convertBtn = document.getElementById('convertBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const stats = document.getElementById('stats');
+
+        function parseCSV(csv, delimiter, trimValues) {
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < csv.length; i++) {
+                const char = csv[i];
+                const nextChar = csv[i + 1];
+
+                if (inQuotes) {
+                    if (char === '"') {
+                        if (nextChar === '"') {
+                            // Escaped quote
+                            currentField += '"';
+                            i++;
+                        } else {
+                            // End of quoted field
+                            inQuotes = false;
+                        }
+                    } else {
+                        currentField += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        inQuotes = true;
+                    } else if (char === delimiter) {
+                        currentRow.push(trimValues ? currentField.trim() : currentField);
+                        currentField = '';
+                    } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
+                        currentRow.push(trimValues ? currentField.trim() : currentField);
+                        if (currentRow.length > 0 && currentRow.some(f => f !== '')) {
+                            rows.push(currentRow);
+                        }
+                        currentRow = [];
+                        currentField = '';
+                        if (char === '\r') i++; // Skip \n in \r\n
+                    } else if (char !== '\r') {
+                        currentField += char;
+                    }
+                }
+            }
+
+            // Don't forget the last field/row
+            currentRow.push(trimValues ? currentField.trim() : currentField);
+            if (currentRow.length > 0 && currentRow.some(f => f !== '')) {
+                rows.push(currentRow);
+            }
+
+            return rows;
+        }
+
+        function convert() {
+            const csv = csvInput.value;
+            const delimiter = delimiterInput.value || ',';
+            const hasHeader = hasHeaderCheckbox.checked;
+            const trimValues = trimValuesCheckbox.checked;
+
+            errorMessage.style.display = 'none';
+            statusIndicator.className = 'status-indicator';
+            stats.textContent = '';
+
+            if (!csv.trim()) {
+                jsonOutput.value = '';
+                return;
+            }
+
+            try {
+                const rows = parseCSV(csv, delimiter, trimValues);
+
+                if (rows.length === 0) {
+                    jsonOutput.value = '[]';
+                    statusIndicator.className = 'status-indicator valid';
+                    return;
+                }
+
+                let result;
+                let rowCount;
+
+                if (hasHeader) {
+                    const headers = rows[0];
+                    const dataRows = rows.slice(1);
+                    rowCount = dataRows.length;
+
+                    result = dataRows.map(row => {
+                        const obj = {};
+                        headers.forEach((header, i) => {
+                            let value = row[i] !== undefined ? row[i] : '';
+                            // Try to parse numbers and booleans
+                            if (value === 'true') value = true;
+                            else if (value === 'false') value = false;
+                            else if (value === 'null') value = null;
+                            else if (value !== '' && !isNaN(value) && !isNaN(parseFloat(value))) {
+                                value = parseFloat(value);
+                            }
+                            obj[header] = value;
+                        });
+                        return obj;
+                    });
+                } else {
+                    rowCount = rows.length;
+                    result = rows.map(row => {
+                        return row.map(value => {
+                            if (value === 'true') return true;
+                            if (value === 'false') return false;
+                            if (value === 'null') return null;
+                            if (value !== '' && !isNaN(value) && !isNaN(parseFloat(value))) {
+                                return parseFloat(value);
+                            }
+                            return value;
+                        });
+                    });
+                }
+
+                jsonOutput.value = JSON.stringify(result, null, 2);
+                statusIndicator.className = 'status-indicator valid';
+                stats.textContent = `${rowCount} rows, ${rows[0]?.length || 0} columns`;
+
+            } catch (e) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Error parsing CSV: ' + e.message;
+                jsonOutput.value = '';
+                statusIndicator.className = 'status-indicator invalid';
+            }
+        }
+
+        convertBtn.addEventListener('click', convert);
+
+        // Auto-convert on input
+        csvInput.addEventListener('input', convert);
+        delimiterInput.addEventListener('input', convert);
+        hasHeaderCheckbox.addEventListener('change', convert);
+        trimValuesCheckbox.addEventListener('change', convert);
+
+        clearBtn.addEventListener('click', () => {
+            csvInput.value = '';
+            jsonOutput.value = '';
+            errorMessage.style.display = 'none';
+            statusIndicator.className = 'status-indicator';
+            stats.textContent = '';
+            csvInput.focus();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            if (!jsonOutput.value) return;
+            navigator.clipboard.writeText(jsonOutput.value).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
