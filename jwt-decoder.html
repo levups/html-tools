@@ -19,22 +19,27 @@
 
         .jwt-input {
             width: 100%;
-            padding: 18px 20px;
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--input-border);
+            border-radius: var(--radius-lg);
             font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: var(--shadow-soft);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
             outline: none;
             resize: vertical;
             min-height: 100px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .jwt-input:hover {
+            border-color: var(--text-muted);
         }
 
         .jwt-input:focus {
-            box-shadow: var(--shadow-elevated);
+            border-color: var(--input-border-focus);
+            box-shadow: var(--shadow-sm), 0 0 0 3px var(--ring-color);
         }
 
         .jwt-input::placeholder {
@@ -53,11 +58,9 @@
 
         .output-card {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--card-border);
-            border-radius: 16px;
-            box-shadow: var(--shadow-soft);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
         }
 
@@ -90,11 +93,13 @@
         .jwt-signature { color: #4d96ff; }
 
         .token-info {
-            background: rgba(255,255,255,0.5);
-            border-radius: 8px;
-            padding: 12px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
             margin-bottom: 20px;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
+            box-shadow: var(--shadow-sm);
         }
 
         .token-info-item {
@@ -111,8 +116,8 @@
             font-weight: 600;
         }
 
-        .token-info-value.valid { color: var(--success-color); }
-        .token-info-value.expired { color: var(--error-color); }
+        .token-info-value.valid { color: var(--accent-mint); }
+        .token-info-value.expired { color: var(--accent-coral); }
 
         .json-key { color: #059669; }
         .json-string { color: #9333ea; }
@@ -128,8 +133,6 @@
     </style>
 </head>
 <body>
-    <div class="shape-dots"></div>
-    <div class="shape-ring"></div>
 
     <a href="index.html" class="back-link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
