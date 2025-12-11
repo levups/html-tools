@@ -7,359 +7,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="common.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <style>
-        :root {
-            --bg-base: #f5f0e8;
-            --text-primary: #1a1a2e;
-            --text-secondary: #4a4a68;
-            --accent-coral: #ff6b6b;
-            --accent-yellow: #ffd93d;
-            --accent-mint: #6bcb77;
-            --accent-blue: #4d96ff;
-            --error-color: #ff6b6b;
-            --success-color: #6bcb77;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --card-border: rgba(255, 255, 255, 0.9);
-            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.08);
-            --shadow-elevated: 0 16px 48px rgba(0, 0, 0, 0.12);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-base);
-            color: var(--text-primary);
-            margin: 0;
-            padding: 24px;
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Neo Memphis decorative shapes */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -100px;
-            right: -100px;
-            width: 350px;
-            height: 350px;
-            background: var(--accent-yellow);
-            border-radius: 50%;
-            opacity: 0.35;
-            z-index: -1;
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -120px;
-            left: -120px;
-            width: 400px;
-            height: 400px;
-            background: var(--accent-coral);
-            border-radius: 50%;
-            opacity: 0.25;
-            z-index: -1;
-        }
-
-        .shape-dots {
-            position: fixed;
-            top: 15%;
-            left: 3%;
-            width: 100px;
-            height: 100px;
-            background-image: radial-gradient(var(--accent-blue) 2px, transparent 2px);
-            background-size: 12px 12px;
-            opacity: 0.4;
-            z-index: -1;
-        }
-
-        .shape-ring {
-            position: fixed;
-            bottom: 10%;
-            right: 5%;
-            width: 120px;
-            height: 120px;
-            border: 6px solid var(--accent-mint);
-            border-radius: 50%;
-            opacity: 0.35;
-            z-index: -1;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.5px;
-        }
-
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-top: 8px;
-        }
-
-        .container {
-            display: flex;
-            flex: 1;
-            gap: 24px;
-            min-height: 0;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .pane {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: var(--shadow-soft);
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .pane:focus-within {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-elevated);
-        }
-
-        .pane-header {
-            padding: 16px 20px;
-            background: linear-gradient(145deg, #ffffff 0%, #f8f8f8 100%);
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-        }
-
-        /* Aqua-style glossy effect */
-        .pane-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%);
-            pointer-events: none;
-        }
-
-        .pane-header .label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .pane-header .icon {
-            width: 20px;
-            height: 20px;
-            color: var(--accent-coral);
-        }
-
-        textarea {
-            flex: 1;
-            border: none;
-            padding: 20px;
-            resize: none;
-            font-family: 'JetBrains Mono', "SF Mono", "Monaco", monospace;
-            font-size: 13px;
-            line-height: 1.7;
-            outline: none;
-            width: 100%;
-            background: transparent;
-            color: var(--text-primary);
-        }
-
-        textarea::placeholder {
-            color: #9ca3af;
-        }
-
-        textarea:focus {
-            background-color: rgba(255,255,255,0.5);
-        }
-
-        #yamlOutput {
-            background: rgba(255,255,255,0.3);
-            color: var(--text-primary);
-        }
-
-        .error-message {
-            color: white;
-            padding: 12px 20px;
-            font-size: 0.85rem;
-            background: linear-gradient(135deg, var(--error-color) 0%, #e85555 100%);
-            display: none;
-            font-weight: 500;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            padding: 0 0 20px 0;
-            gap: 12px;
-        }
-
-        button {
-            padding: 12px 24px;
-            cursor: pointer;
-            background: linear-gradient(145deg, #ffffff 0%, #e8e8e8 100%);
-            color: var(--text-primary);
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.8);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Aqua glossy button effect */
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%);
-            pointer-events: none;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.8);
-        }
-
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255,255,255,0.8);
-        }
-
-        button.secondary {
-            background: linear-gradient(145deg, var(--accent-yellow) 0%, #f5c800 100%);
-            border-color: rgba(0,0,0,0.05);
-            box-shadow: 0 4px 12px rgba(255, 217, 61, 0.3), inset 0 1px 0 rgba(255,255,255,0.5);
-        }
-
-        button.secondary:hover {
-            box-shadow: 0 6px 20px rgba(255, 217, 61, 0.4), inset 0 1px 0 rgba(255,255,255,0.5);
-        }
-
-        .copy-btn {
-            font-size: 12px;
-            padding: 8px 14px;
-            background: linear-gradient(145deg, var(--accent-blue) 0%, #3d7de0 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(77, 150, 255, 0.3);
-        }
-
-        .copy-btn:hover {
-            box-shadow: 0 4px 12px rgba(77, 150, 255, 0.4);
-        }
-
-        .copy-btn.copied {
-            background: linear-gradient(145deg, var(--success-color) 0%, #5ab868 100%);
-            box-shadow: 0 2px 8px rgba(107, 203, 119, 0.4);
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #d1d5db;
-            margin-left: 8px;
-            transition: all 0.2s;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .status-indicator.valid {
-            background: linear-gradient(145deg, var(--success-color) 0%, #5ab868 100%);
-            box-shadow: 0 0 12px rgba(107, 203, 119, 0.6), inset 0 1px 0 rgba(255,255,255,0.3);
-        }
-
-        .status-indicator.invalid {
-            background: linear-gradient(145deg, var(--error-color) 0%, #e85555 100%);
-            box-shadow: 0 0 12px rgba(255, 107, 107, 0.6), inset 0 1px 0 rgba(255,255,255,0.3);
-        }
-
-        .back-link {
-            position: absolute;
-            top: 24px;
-            left: 24px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.2s;
-        }
-
-        .back-link:hover {
-            color: var(--text-primary);
-        }
-
-        .back-link svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 16px;
-            }
-
-            .container {
-                flex-direction: column;
-            }
-
-            h1 {
-                font-size: 1.6rem;
-            }
-
-            .pane {
-                min-height: 280px;
-            }
-
-            .back-link {
-                position: static;
-                margin-bottom: 16px;
-                justify-content: center;
-            }
-
-            .shape-dots, .shape-ring {
-                display: none;
-            }
         }
     </style>
 </head>
@@ -424,7 +77,6 @@ Example:
     </div>
 
     <script>
-        // DOM Elements
         const jsonInput = document.getElementById('jsonInput');
         const yamlOutput = document.getElementById('yamlOutput');
         const clearBtn = document.getElementById('clearBtn');
@@ -432,11 +84,9 @@ Example:
         const jsonError = document.getElementById('jsonError');
         const statusIndicator = document.getElementById('statusIndicator');
 
-        // Conversion Logic
         function convert() {
             const rawJson = jsonInput.value.trim();
 
-            // Clear previous errors and status
             jsonError.style.display = 'none';
             jsonError.textContent = '';
             statusIndicator.className = 'status-indicator';
@@ -447,17 +97,11 @@ Example:
             }
 
             try {
-                // 1. Parse JSON
                 const parsedObj = JSON.parse(rawJson);
-
-                // 2. Dump to YAML using js-yaml library
                 const yamlString = jsyaml.dump(parsedObj);
-
-                // 3. Output result and show valid status
                 yamlOutput.value = yamlString;
                 statusIndicator.className = 'status-indicator valid';
             } catch (e) {
-                // Handle JSON Parse Errors
                 jsonError.style.display = 'block';
                 jsonError.textContent = `Invalid JSON: ${e.message}`;
                 yamlOutput.value = '';
@@ -465,10 +109,8 @@ Example:
             }
         }
 
-        // Real-time conversion on input
         jsonInput.addEventListener('input', convert);
 
-        // Clear button
         clearBtn.addEventListener('click', () => {
             jsonInput.value = '';
             yamlOutput.value = '';
@@ -477,7 +119,6 @@ Example:
             jsonInput.focus();
         });
 
-        // Copy to clipboard
         copyBtn.addEventListener('click', () => {
             if (!yamlOutput.value) return;
             navigator.clipboard.writeText(yamlOutput.value).then(() => {
