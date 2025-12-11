@@ -24,6 +24,7 @@ A collection of simple, browser-based utilities. No server required - just open 
 - URL Parser - Decompose URL into components
 - Regex Tester - Test JS regex with highlighting
 - Clipboard Viewer - Inspect all clipboard formats and data
+- EXIF Viewer - Extract metadata and GPS from images
 
 **Other Tools**
 - Markdown Preview - Live markdown to HTML
