@@ -436,19 +436,36 @@
             updating = false;
         }
 
-        timestampInput.addEventListener('input', fromTimestamp);
-        dateInput.addEventListener('input', fromDateTime);
-        timeInput.addEventListener('input', fromDateTime);
-        timezoneSelect.addEventListener('change', fromDateTime);
+        function updatePageURL() {
+            const ts = timestampInput.value.trim();
+            const newURL = new URL(window.location.href);
+
+            if (ts) newURL.searchParams.set('ts', ts);
+            else newURL.searchParams.delete('ts');
+
+            history.replaceState(null, '', newURL.toString());
+        }
+
+        timestampInput.addEventListener('input', () => { fromTimestamp(); updatePageURL(); });
+        dateInput.addEventListener('input', () => { fromDateTime(); updatePageURL(); });
+        timeInput.addEventListener('input', () => { fromDateTime(); updatePageURL(); });
+        timezoneSelect.addEventListener('change', () => { fromDateTime(); updatePageURL(); });
 
         nowBtn.addEventListener('click', () => {
             const now = Date.now();
             timestampInput.value = Math.floor(now / 1000);
             fromTimestamp();
+            updatePageURL();
         });
 
-        // Initialize with current time
-        nowBtn.click();
+        // Load from URL or initialize with current time
+        const initialTs = new URLSearchParams(window.location.search).get('ts');
+        if (initialTs) {
+            timestampInput.value = initialTs;
+            fromTimestamp();
+        } else {
+            nowBtn.click();
+        }
 
         // Click to copy functionality
         document.querySelectorAll('.output-item[data-copy]').forEach(item => {
