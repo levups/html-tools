@@ -752,7 +752,30 @@
             });
         }
 
-        colorInput.addEventListener('input', (e) => updateDisplay(e.target.value));
+        function updatePageURL() {
+            const input = colorInput.value.trim();
+            const newURL = new URL(window.location.href);
+
+            if (input) {
+                newURL.searchParams.set('c', input);
+            } else {
+                newURL.searchParams.delete('c');
+            }
+
+            history.replaceState(null, '', newURL.toString());
+        }
+
+        colorInput.addEventListener('input', (e) => {
+            updateDisplay(e.target.value);
+            updatePageURL();
+        });
+
+        // Load from URL on init
+        const initialColor = new URLSearchParams(window.location.search).get('c');
+        if (initialColor) {
+            colorInput.value = initialColor;
+            updateDisplay(initialColor);
+        }
 
         // Copy buttons
         formatCards.forEach(card => {
