@@ -37,6 +37,7 @@ A collection of simple, browser-based utilities. No server required - just open 
 - Diff - Compare text with colored output
 - OCR - Extract text from images and PDFs (Tesseract.js)
 - QR Code Generator - Generate styled QR codes with PNG/SVG download
+- Password Generator - Generate secure random passwords with customizable options
 
 ## Usage
 

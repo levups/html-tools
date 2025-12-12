@@ -193,7 +193,7 @@
 
         .example-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 10px;
         }
 
@@ -227,9 +227,11 @@
 
         .example-iban {
             font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-            font-size: 0.8125rem;
+            font-size: 0.75rem;
             color: var(--text-primary);
-            word-break: break-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         @media (max-width: 640px) {
