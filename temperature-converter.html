@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .temp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .temp-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-soft);
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .temp-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-elevated);
+        }
+
+        .temp-card:focus-within {
+            box-shadow: var(--shadow-md);
+        }
+
+        .temp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .temp-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        .temp-symbol {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .temp-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 1.1rem;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .temp-input:hover {
+            border-color: var(--text-muted);
+        }
+
+        .temp-input:focus {
+            border-color: var(--input-border-focus);
+            box-shadow: 0 0 0 3px var(--ring-color);
+        }
+
+        .temp-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .reference-points {
+            max-width: 800px;
+            margin: 40px auto 0;
+            width: 100%;
+        }
+
+        .reference-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .reference-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+        }
+
+        .reference-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+            border-color: var(--text-muted);
+        }
+
+        .reference-item:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--ring-color);
+            border-color: var(--input-border-focus);
+        }
+
+        .reference-label {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .reference-value {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .temp-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reference-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .reference-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        All Tools
+    </a>
+
+    <header>
+        <h1>Temperature Converter</h1>
+        <p class="subtitle">Convert between all major temperature scales</p>
+    </header>
+
+    <div class="temp-grid" id="tempGrid">
+        <div class="temp-card" data-scale="celsius">
+            <div class="temp-header">
+                <label for="celsius" class="temp-name">Celsius</label>
+                <span class="temp-symbol">°C</span>
+            </div>
+            <input type="number" id="celsius" class="temp-input" placeholder="0" step="any" aria-label="Temperature in Celsius">
+        </div>
+
+        <div class="temp-card" data-scale="fahrenheit">
+            <div class="temp-header">
+                <label for="fahrenheit" class="temp-name">Fahrenheit</label>
+                <span class="temp-symbol">°F</span>
+            </div>
+            <input type="number" id="fahrenheit" class="temp-input" placeholder="32" step="any" aria-label="Temperature in Fahrenheit">
+        </div>
+
+        <div class="temp-card" data-scale="kelvin">
+            <div class="temp-header">
+                <label for="kelvin" class="temp-name">Kelvin</label>
+                <span class="temp-symbol">K</span>
+            </div>
+            <input type="number" id="kelvin" class="temp-input" placeholder="273.15" step="any" aria-label="Temperature in Kelvin">
+        </div>
+
+        <div class="temp-card" data-scale="rankine">
+            <div class="temp-header">
+                <label for="rankine" class="temp-name">Rankine</label>
+                <span class="temp-symbol">°R</span>
+            </div>
+            <input type="number" id="rankine" class="temp-input" placeholder="491.67" step="any" aria-label="Temperature in Rankine">
+        </div>
+
+        <div class="temp-card" data-scale="delisle">
+            <div class="temp-header">
+                <label for="delisle" class="temp-name">Delisle</label>
+                <span class="temp-symbol">°De</span>
+            </div>
+            <input type="number" id="delisle" class="temp-input" placeholder="150" step="any" aria-label="Temperature in Delisle">
+        </div>
+
+        <div class="temp-card" data-scale="newton">
+            <div class="temp-header">
+                <label for="newton" class="temp-name">Newton</label>
+                <span class="temp-symbol">°N</span>
+            </div>
+            <input type="number" id="newton" class="temp-input" placeholder="0" step="any" aria-label="Temperature in Newton">
+        </div>
+
+        <div class="temp-card" data-scale="reaumur">
+            <div class="temp-header">
+                <label for="reaumur" class="temp-name">Réaumur</label>
+                <span class="temp-symbol">°Ré</span>
+            </div>
+            <input type="number" id="reaumur" class="temp-input" placeholder="0" step="any" aria-label="Temperature in Réaumur">
+        </div>
+
+        <div class="temp-card" data-scale="romer">
+            <div class="temp-header">
+                <label for="romer" class="temp-name">Rømer</label>
+                <span class="temp-symbol">°Rø</span>
+            </div>
+            <input type="number" id="romer" class="temp-input" placeholder="7.5" step="any" aria-label="Temperature in Rømer">
+        </div>
+    </div>
+
+    <div class="reference-points">
+        <div class="reference-title">Quick Reference Points</div>
+        <div class="reference-grid" role="list">
+            <button class="reference-item" data-celsius="-273.15" role="listitem" aria-label="Set to Absolute Zero">
+                <div class="reference-label">Absolute Zero</div>
+                <div class="reference-value">−273.15 °C</div>
+            </button>
+            <button class="reference-item" data-celsius="0" role="listitem" aria-label="Set to Water Freezing Point">
+                <div class="reference-label">Water Freezing</div>
+                <div class="reference-value">0 °C</div>
+            </button>
+            <button class="reference-item" data-celsius="20" role="listitem" aria-label="Set to Room Temperature">
+                <div class="reference-label">Room Temperature</div>
+                <div class="reference-value">20 °C</div>
+            </button>
+            <button class="reference-item" data-celsius="37" role="listitem" aria-label="Set to Body Temperature">
+                <div class="reference-label">Body Temperature</div>
+                <div class="reference-value">37 °C</div>
+            </button>
+            <button class="reference-item" data-celsius="100" role="listitem" aria-label="Set to Water Boiling Point">
+                <div class="reference-label">Water Boiling</div>
+                <div class="reference-value">100 °C</div>
+            </button>
+            <button class="reference-item" data-celsius="-40" role="listitem" aria-label="Set to Fahrenheit-Celsius Equal Point">
+                <div class="reference-label">°F = °C Point</div>
+                <div class="reference-value">−40 °C / °F</div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Round to reasonable precision
+        const round = (val, decimals = 4) => {
+            const num = Math.round(val * 10**decimals) / 10**decimals;
+            return Object.is(num, -0) ? 0 : num;
+        };
+
+        // Conversion functions (all use Celsius as base)
+        const conversions = {
+            // To Celsius
+            toCelsius: {
+                celsius: c => c,
+                fahrenheit: f => (f - 32) * 5/9,
+                kelvin: k => k - 273.15,
+                rankine: r => (r - 491.67) * 5/9,
+                delisle: de => 100 - de * 2/3,
+                newton: n => n * 100/33,
+                reaumur: re => re * 5/4,
+                romer: ro => (ro - 7.5) * 40/21
+            },
+            // From Celsius
+            fromCelsius: {
+                celsius: c => c,
+                fahrenheit: c => c * 9/5 + 32,
+                kelvin: c => c + 273.15,
+                rankine: c => (c + 273.15) * 9/5,
+                delisle: c => (100 - c) * 3/2,
+                newton: c => c * 33/100,
+                reaumur: c => c * 4/5,
+                romer: c => c * 21/40 + 7.5
+            }
+        };
+
+        const scales = ['celsius', 'fahrenheit', 'kelvin', 'rankine', 'delisle', 'newton', 'reaumur', 'romer'];
+        const inputs = {};
+        let updating = false;
+
+        // Get all inputs
+        scales.forEach(scale => {
+            inputs[scale] = document.getElementById(scale);
+        });
+
+        // Update all fields from a source scale
+        function updateFromScale(sourceScale, value) {
+            if (updating) return;
+            updating = true;
+
+            const celsius = conversions.toCelsius[sourceScale](value);
+
+            scales.forEach(scale => {
+                if (scale !== sourceScale) {
+                    const converted = conversions.fromCelsius[scale](celsius);
+                    inputs[scale].value = isNaN(converted) ? '' : round(converted);
+                }
+            });
+
+            updateURL(sourceScale, value);
+            updating = false;
+        }
+
+        // Clear all fields
+        function clearAll() {
+            scales.forEach(scale => {
+                inputs[scale].value = '';
+            });
+        }
+
+        // Update URL with current value
+        function updateURL(scale, value) {
+            const url = new URL(window.location.href);
+            if (value !== '' && !isNaN(value)) {
+                url.searchParams.set('scale', scale);
+                url.searchParams.set('value', value);
+            } else {
+                url.searchParams.delete('scale');
+                url.searchParams.delete('value');
+            }
+            history.replaceState(null, '', url.toString());
+        }
+
+        // Add event listeners
+        scales.forEach(scale => {
+            inputs[scale].addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value === '' || value === '-') {
+                    clearAll();
+                    e.target.value = value;
+                    return;
+                }
+                const numValue = parseFloat(value);
+                if (!isNaN(numValue)) {
+                    updateFromScale(scale, numValue);
+                }
+            });
+        });
+
+        // Reference point buttons
+        document.querySelectorAll('.reference-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const celsius = parseFloat(item.dataset.celsius);
+                inputs.celsius.value = round(celsius);
+                updateFromScale('celsius', celsius);
+            });
+        });
+
+        // Load from URL on init
+        const params = new URLSearchParams(window.location.search);
+        const initialScale = params.get('scale');
+        const initialValue = params.get('value');
+
+        if (initialScale && initialValue && scales.includes(initialScale)) {
+            const numValue = parseFloat(initialValue);
+            if (!isNaN(numValue)) {
+                inputs[initialScale].value = round(numValue);
+                updateFromScale(initialScale, numValue);
+            }
+        }
+    </script>
+</body>
+</html>

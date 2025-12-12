@@ -8,6 +8,7 @@ A collection of simple, browser-based utilities. No server required - just open 
 - JSON to YAML - Convert JSON to YAML format
 - CSV to JSON - Convert CSV with custom delimiters
 - Color Converter - HEX, RGB, HSL, HWB, LAB, LCH, OKLAB, OKLCH
+- Temperature Converter - Celsius, Fahrenheit, Kelvin, Rankine, Delisle, Newton, Réaumur, Rømer
 - Timestamp Converter - Unix timestamps with timezone support
 
 **Formatters**
