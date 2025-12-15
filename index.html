@@ -78,7 +78,8 @@
             border-color: var(--text-muted);
         }
 
-        .tool-card:focus {
+        .tool-card:focus,
+        .tool-card.selected {
             outline: none;
             box-shadow: var(--shadow-sm), 0 0 0 3px var(--ring-color);
             border-color: var(--input-border-focus);
@@ -258,6 +259,26 @@
         const filterInput = document.getElementById('filterInput');
         const noResults = document.getElementById('noResults');
         const toolCards = document.querySelectorAll('.tool-card');
+        let selectedIndex = -1;
+
+        function getVisibleCards() {
+            return Array.from(toolCards).filter(card => !card.classList.contains('hidden'));
+        }
+
+        function updateSelection(newIndex) {
+            const visibleCards = getVisibleCards();
+
+            // Clear previous selection
+            toolCards.forEach(card => card.classList.remove('selected'));
+
+            if (newIndex >= 0 && newIndex < visibleCards.length) {
+                selectedIndex = newIndex;
+                visibleCards[selectedIndex].classList.add('selected');
+                visibleCards[selectedIndex].scrollIntoView({ block: 'nearest' });
+            } else {
+                selectedIndex = -1;
+            }
+        }
 
         function filterTools(query) {
             query = query.toLowerCase().trim();
@@ -275,9 +296,75 @@
             });
 
             noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+
+            // Reset selection when filter changes
+            updateSelection(-1);
         }
 
         filterInput.addEventListener('input', e => filterTools(e.target.value));
+
+        function findCardInDirection(direction) {
+            const visibleCards = getVisibleCards();
+            if (selectedIndex < 0) return 0;
+
+            const current = visibleCards[selectedIndex];
+            const currentRect = current.getBoundingClientRect();
+            const currentCenterX = currentRect.left + currentRect.width / 2;
+            const currentCenterY = currentRect.top + currentRect.height / 2;
+
+            let bestIndex = -1;
+            let bestDistance = Infinity;
+
+            visibleCards.forEach((card, index) => {
+                if (index === selectedIndex) return;
+
+                const rect = card.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                let isValid = false;
+                if (direction === 'up') isValid = centerY < currentCenterY - 10;
+                else if (direction === 'down') isValid = centerY > currentCenterY + 10;
+                else if (direction === 'left') isValid = centerX < currentCenterX - 10 && Math.abs(centerY - currentCenterY) < 20;
+                else if (direction === 'right') isValid = centerX > currentCenterX + 10 && Math.abs(centerY - currentCenterY) < 20;
+
+                if (isValid) {
+                    const dx = centerX - currentCenterX;
+                    const dy = centerY - currentCenterY;
+                    // Weight horizontal distance more for up/down, vertical for left/right
+                    const distance = (direction === 'up' || direction === 'down')
+                        ? Math.abs(dy) + Math.abs(dx) * 0.5
+                        : Math.abs(dx) + Math.abs(dy) * 0.5;
+
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestIndex = index;
+                    }
+                }
+            });
+
+            return bestIndex >= 0 ? bestIndex : selectedIndex;
+        }
+
+        filterInput.addEventListener('keydown', e => {
+            const visibleCards = getVisibleCards();
+            if (visibleCards.length === 0) return;
+
+            const directions = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+            const direction = directions[e.key];
+
+            if (direction) {
+                e.preventDefault();
+                if (selectedIndex < 0) {
+                    updateSelection(0);
+                } else {
+                    updateSelection(findCardInDirection(direction));
+                }
+            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                e.preventDefault();
+                visibleCards[selectedIndex].click();
+            }
+        });
 
         const initialQuery = new URLSearchParams(window.location.search).get('q');
         if (initialQuery) {
