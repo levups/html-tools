@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Formatter</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body { display: flex; flex-direction: column; }
+        .options { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        All Tools
+    </a>
+
+    <header>
+        <h1>HTML Formatter</h1>
+        <p class="subtitle">Pretty print or minify HTML</p>
+    </header>
+
+    <div class="controls">
+        <button id="formatBtn">Format</button>
+        <button id="minifyBtn">Minify</button>
+        <button id="clearBtn" class="secondary">Clear</button>
+        <div class="options">
+            <div class="option-group">
+                <label for="indentSelect">Indent:</label>
+                <select id="indentSelect">
+                    <option value="2">2 spaces</option>
+                    <option value="4">4 spaces</option>
+                    <option value="tab">Tab</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="pane">
+            <div class="pane-header">
+                <span class="label">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    Input
+                    <span id="statusIndicator" class="status-indicator"></span>
+                </span>
+            </div>
+            <textarea id="inputArea" placeholder='Paste your HTML here...
+
+Example:
+<div><p>Hello</p><span>World</span></div>' spellcheck="false"></textarea>
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+
+        <div class="pane">
+            <div class="pane-header">
+                <span class="label">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    Output
+                </span>
+                <button id="copyBtn" class="copy-btn">Copy</button>
+            </div>
+            <textarea id="outputArea" readonly placeholder="Formatted HTML will appear here..." spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <script>
+        const inputArea = document.getElementById('inputArea');
+        const outputArea = document.getElementById('outputArea');
+        const formatBtn = document.getElementById('formatBtn');
+        const minifyBtn = document.getElementById('minifyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const indentSelect = document.getElementById('indentSelect');
+        const errorMessage = document.getElementById('errorMessage');
+        const statusIndicator = document.getElementById('statusIndicator');
+
+        // Void elements that don't have closing tags
+        const voidElements = new Set([
+            'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+            'link', 'meta', 'param', 'source', 'track', 'wbr'
+        ]);
+
+        // Elements that should preserve whitespace
+        const preserveWhitespaceElements = new Set(['pre', 'code', 'textarea', 'script', 'style']);
+
+        // Inline elements that shouldn't add newlines
+        const inlineElements = new Set([
+            'a', 'abbr', 'acronym', 'b', 'bdo', 'big', 'br', 'button', 'cite',
+            'code', 'dfn', 'em', 'i', 'img', 'input', 'kbd', 'label', 'map',
+            'object', 'output', 'q', 'samp', 'select', 'small', 'span', 'strong',
+            'sub', 'sup', 'textarea', 'time', 'tt', 'var'
+        ]);
+
+        function getIndent(indentValue) {
+            return indentValue === 'tab' ? '\t' : ' '.repeat(parseInt(indentValue, 10));
+        }
+
+        function formatNode(node, indent, level, preserveWS) {
+            const indentStr = indent.repeat(level);
+            let result = '';
+
+            if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent;
+                if (preserveWS) {
+                    return text;
+                }
+                const trimmed = text.trim();
+                if (!trimmed) return '';
+                return trimmed;
+            }
+
+            if (node.nodeType === Node.COMMENT_NODE) {
+                return `${indentStr}<!--${node.textContent}-->`;
+            }
+
+            if (node.nodeType === Node.DOCUMENT_TYPE_NODE) {
+                return `<!DOCTYPE ${node.name}>`;
+            }
+
+            if (node.nodeType !== Node.ELEMENT_NODE) {
+                return '';
+            }
+
+            const tagName = node.tagName.toLowerCase();
+            const isVoid = voidElements.has(tagName);
+            const shouldPreserveWS = preserveWhitespaceElements.has(tagName);
+            const isInline = inlineElements.has(tagName);
+
+            // Build opening tag
+            let openTag = `<${tagName}`;
+            for (const attr of node.attributes) {
+                openTag += ` ${attr.name}="${attr.value.replace(/"/g, '&quot;')}"`;
+            }
+
+            if (isVoid) {
+                return `${indentStr}${openTag}>`;
+            }
+
+            openTag += '>';
+
+            // Handle content
+            const children = Array.from(node.childNodes);
+
+            if (children.length === 0) {
+                return `${indentStr}${openTag}</${tagName}>`;
+            }
+
+            if (shouldPreserveWS) {
+                // Preserve whitespace for pre, code, etc.
+                let content = '';
+                for (const child of children) {
+                    if (child.nodeType === Node.TEXT_NODE) {
+                        content += child.textContent;
+                    } else if (child.nodeType === Node.ELEMENT_NODE) {
+                        content += formatNode(child, indent, 0, true);
+                    }
+                }
+                return `${indentStr}${openTag}${content}</${tagName}>`;
+            }
+
+            // Check if content is simple (single text node or only inline elements with text)
+            const hasBlockChildren = children.some(child =>
+                child.nodeType === Node.ELEMENT_NODE && !inlineElements.has(child.tagName.toLowerCase())
+            );
+
+            const onlyTextAndInline = children.every(child =>
+                child.nodeType === Node.TEXT_NODE ||
+                (child.nodeType === Node.ELEMENT_NODE && inlineElements.has(child.tagName.toLowerCase()))
+            );
+
+            if (onlyTextAndInline && !hasBlockChildren) {
+                // Keep inline content on same line
+                let content = '';
+                for (const child of children) {
+                    content += formatNode(child, indent, 0, false);
+                }
+                return `${indentStr}${openTag}${content}</${tagName}>`;
+            }
+
+            // Multi-line formatting for block content
+            result = `${indentStr}${openTag}\n`;
+            for (const child of children) {
+                const childResult = formatNode(child, indent, level + 1, false);
+                if (childResult) {
+                    result += childResult + '\n';
+                }
+            }
+            result += `${indentStr}</${tagName}>`;
+
+            return result;
+        }
+
+        function formatHTML(html, indent) {
+            // Parse as HTML fragment
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Check for parsing errors in body
+            const errorNode = doc.querySelector('parsererror');
+            if (errorNode) {
+                throw new Error('Invalid HTML: ' + errorNode.textContent);
+            }
+
+            // Determine what to format
+            let result = '';
+
+            // Check if input has doctype or html/head/body
+            const hasFullDoc = html.trim().toLowerCase().startsWith('<!doctype') ||
+                              html.trim().toLowerCase().startsWith('<html');
+
+            if (hasFullDoc) {
+                // Format full document
+                if (doc.doctype) {
+                    result += formatNode(doc.doctype, indent, 0, false) + '\n';
+                }
+                result += formatNode(doc.documentElement, indent, 0, false);
+            } else {
+                // Format just the body content (fragment mode)
+                const body = doc.body;
+                const lines = [];
+                for (const child of body.childNodes) {
+                    const formatted = formatNode(child, indent, 0, false);
+                    if (formatted) {
+                        lines.push(formatted);
+                    }
+                }
+                result = lines.join('\n');
+            }
+
+            return result;
+        }
+
+        function minifyHTML(html) {
+            // Parse as HTML fragment
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            function minifyNode(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const tagName = node.parentElement?.tagName.toLowerCase();
+                    if (preserveWhitespaceElements.has(tagName)) {
+                        return node.textContent;
+                    }
+                    return node.textContent.replace(/\s+/g, ' ').trim();
+                }
+
+                if (node.nodeType === Node.COMMENT_NODE) {
+                    return `<!--${node.textContent}-->`;
+                }
+
+                if (node.nodeType === Node.DOCUMENT_TYPE_NODE) {
+                    return `<!DOCTYPE ${node.name}>`;
+                }
+
+                if (node.nodeType !== Node.ELEMENT_NODE) {
+                    return '';
+                }
+
+                const tagName = node.tagName.toLowerCase();
+                const isVoid = voidElements.has(tagName);
+                const shouldPreserveWS = preserveWhitespaceElements.has(tagName);
+
+                let openTag = `<${tagName}`;
+                for (const attr of node.attributes) {
+                    openTag += ` ${attr.name}="${attr.value.replace(/"/g, '&quot;')}"`;
+                }
+                openTag += '>';
+
+                if (isVoid) {
+                    return openTag;
+                }
+
+                let content = '';
+                for (const child of node.childNodes) {
+                    const minified = minifyNode(child);
+                    if (shouldPreserveWS) {
+                        content += minified;
+                    } else if (minified) {
+                        content += minified;
+                    }
+                }
+
+                return `${openTag}${content}</${tagName}>`;
+            }
+
+            const hasFullDoc = html.trim().toLowerCase().startsWith('<!doctype') ||
+                              html.trim().toLowerCase().startsWith('<html');
+
+            if (hasFullDoc) {
+                let result = '';
+                if (doc.doctype) {
+                    result += minifyNode(doc.doctype);
+                }
+                result += minifyNode(doc.documentElement);
+                return result;
+            } else {
+                let result = '';
+                for (const child of doc.body.childNodes) {
+                    result += minifyNode(child);
+                }
+                return result;
+            }
+        }
+
+        function format(minify = false) {
+            const input = inputArea.value.trim();
+
+            errorMessage.style.display = 'none';
+            statusIndicator.className = 'status-indicator';
+
+            if (!input) {
+                outputArea.value = '';
+                return;
+            }
+
+            try {
+                if (minify) {
+                    outputArea.value = minifyHTML(input);
+                } else {
+                    const indent = getIndent(indentSelect.value);
+                    outputArea.value = formatHTML(input, indent);
+                }
+                statusIndicator.className = 'status-indicator valid';
+            } catch (e) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = e.message;
+                outputArea.value = '';
+                statusIndicator.className = 'status-indicator invalid';
+            }
+        }
+
+        formatBtn.addEventListener('click', () => format(false));
+        minifyBtn.addEventListener('click', () => format(true));
+
+        // Auto-format on input
+        inputArea.addEventListener('input', () => format(false));
+
+        clearBtn.addEventListener('click', () => {
+            inputArea.value = '';
+            outputArea.value = '';
+            errorMessage.style.display = 'none';
+            statusIndicator.className = 'status-indicator';
+            inputArea.focus();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            if (!outputArea.value) return;
+            navigator.clipboard.writeText(outputArea.value).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        });
+
+        // Re-format when options change
+        indentSelect.addEventListener('change', () => format(false));
+    </script>
+</body>
+</html>

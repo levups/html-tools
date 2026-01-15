@@ -14,7 +14,9 @@ A collection of simple, browser-based utilities. No server required - just open 
 - XML ↔ JSON - Bidirectional XML and JSON conversion
 
 **Formatters**
+- HTML Formatter - Pretty print or minify HTML
 - JSON Formatter - Pretty print or minify with key sorting
+- XML Formatter - Pretty print or minify XML
 - YAML Formatter - Pretty print with key sorting
 
 **Encoders/Decoders**
